@@ -68,15 +68,40 @@ const Query = new GraphQLObjectType({
         message: {type: GraphQLString}
       },
       resolve: function(source, {message}) {
-        return {aa: 10};
+        return message;
       }
     }
   })
 });
 
+const Mutation = new GraphQLObjectType({
+  name: 'BlogMutation',
+  description: 'Changes maker of our blog',
+  fields: () => ({
+    createPost: {
+      type: Post,
+      args: {
+        title: {
+          type: new GraphQLNonNull(GraphQLString)
+        },
+        content: {
+          type: new GraphQLNonNull(GraphQLString)
+        }
+      },
+      resolve: (source, args) => {
+        let post = Object.assign({}, args);
+        post._id = `${Date.now()}::${Math.ceil(Math.random() * 9999999)}`;
+        post.content = args.content;
+        PostsList.push(post);
+        return post;
+      }
+    }
+  })
+})
 // This the Schema
 const Schema = new GraphQLSchema({
-  query: Query
+  query: Query,
+  mutation: Mutation,
 });
 
 export default Schema;
